@@ -1,0 +1,9 @@
+body { font-family: Arial, sans-serif; margin: 24px; max-width: 900px; }
+.menu a { margin-right: 16px; text-decoration: none; font-weight: bold; }
+label { display: block; margin-top: 12px; font-weight: bold; }
+input, select { padding: 4px; min-width: 240px; }
+table { border-collapse: collapse; margin-top: 12px; }
+th, td { border: 1px solid #999; padding: 6px 10px; }
+.error { color: #b00020; margin: 2px 0; }
+.msg { color: #1b5e20; }
+.inline { display: inline; }
