@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<h1 th:text="${customer.id == null} ? 'Nuevo cliente' : 'Editar cliente'">Cliente</h1>
+
+<form th:action="@{/customers/save}" th:object="${customer}" method="post">
+    <input type="hidden" th:field="*{id}">
+
+    <label>Nombre</label>
+    <input type="text" th:field="*{name}">
+    <p class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+
+    <label>Tipo de documento</label>
+    <select th:field="*{documentType}">
+        <option value="">-- Seleccione --</option>
+        <option th:each="t : ${documentTypes}" th:value="${t}" th:text="${t}"></option>
+    </select>
+    <p class="error" th:if="${#fields.hasErrors('documentType')}" th:errors="*{documentType}"></p>
+
+    <label>Número de documento</label>
+    <input type="text" th:field="*{document}">
+    <p class="error" th:if="${#fields.hasErrors('document')}" th:errors="*{document}"></p>
+
+    <br><br>
+    <button type="submit">Guardar</button>
+    <a th:href="@{/customers}">Cancelar</a>
+</form>
+</body>
+</html>

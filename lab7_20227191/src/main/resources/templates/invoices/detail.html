@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del pedido</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<h1 th:text="${invoice.type + ' N° ' + invoice.id}">Pedido</h1>
+<p>Fecha: <span th:text="${invoice.date}"></span></p>
+<p>Cliente: <span th:text="${invoice.customer.name + ' (' + invoice.customer.documentType + ' ' + invoice.customer.document + ')'}"></span></p>
+
+<table>
+    <tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr>
+    <tr th:each="d : ${invoice.details}">
+        <td th:text="${d.product.name}"></td>
+        <td th:text="${d.quantity}"></td>
+        <td th:text="${#numbers.formatDecimal(d.price, 1, 2)}"></td>
+        <td th:text="${#numbers.formatDecimal(d.subtotal, 1, 2)}"></td>
+    </tr>
+    <tr>
+        <th colspan="3">TOTAL</th>
+        <th th:text="${#numbers.formatDecimal(invoice.total, 1, 2)}"></th>
+    </tr>
+</table>
+
+<p><a th:href="@{/invoices}">Volver al listado</a></p>
+</body>
+</html>
