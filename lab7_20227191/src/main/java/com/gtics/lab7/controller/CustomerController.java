@@ -51,4 +51,54 @@ public class CustomerController {
         model.addAttribute("customer", customer);   // mismo nombre que th:object="${customer}"
         return "customers/form";
     }
+
+    @PostMapping("/save")
+    public String guardar(@ModelAttribute("customer") @Valid Customer customer,
+                          BindingResult bindingResult,
+                          RedirectAttributes attr) {
+
+        validarDocumento(customer, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            return "customers/form";   // sin redirect: se conserva el objeto y los errores
+        }
+
+        boolean esNuevo = customer.getId() == null;
+        customerRepository.save(customer);
+        attr.addFlashAttribute("msg", esNuevo ? "Cliente registrado" : "Cliente actualizado");
+        return "redirect:/customers";
+    }
+
+    @PostMapping("/delete")
+    public String eliminar(@RequestParam("id") Integer id, RedirectAttributes attr) {
+        try {
+            customerRepository.deleteById(id);
+            attr.addFlashAttribute("msg", "Cliente eliminado");
+        } catch (DataIntegrityViolationException e) {
+            attr.addFlashAttribute("error", "No se puede eliminar: el cliente tiene pedidos asociados");
+        }
+        return "redirect:/customers";
+    }
+
+    // Reglas que dependen de más de un campo y unicidad
+    private void validarDocumento(Customer customer, BindingResult br) {
+        if (br.hasFieldErrors("documentType") || br.hasFieldErrors("document")) {
+            return;
+        }
+
+        int longitud = "DNI".equals(customer.getDocumentType()) ? 8 : 11;
+        if (customer.getDocument().length() != longitud) {
+            br.rejectValue("document", "document.length",
+                    customer.getDocumentType() + " debe contener exactamente " + longitud + " dígitos");
+            return;
+        }
+
+        boolean duplicado = (customer.getId() == null)
+                ? customerRepository.existsByDocument(customer.getDocument())
+                : customerRepository.existsByDocumentAndIdNot(customer.getDocument(), customer.getId());
+        if (duplicado) {
+            br.rejectValue("document", "document.duplicate",
+                    "Ya existe un cliente registrado con ese número de documento");
+        }
+    }
 }
