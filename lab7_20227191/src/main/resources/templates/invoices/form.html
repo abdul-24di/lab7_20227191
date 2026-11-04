@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo pedido</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<h1>Nuevo pedido</h1>
+
+<form th:action="@{/invoices/save}" th:object="${invoiceForm}" method="post">
+
+    <!-- errores globales (reglas que dependen de varios campos) -->
+    <div th:if="${#fields.hasGlobalErrors()}">
+        <p class="error" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+    </div>
+
+    <label>Tipo de comprobante</label>
+    <select th:field="*{type}">
+        <option value="">-- Seleccione --</option>
+        <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+    </select>
+    <p class="error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+
+    <label>Fecha</label>
+    <input type="date" th:field="*{date}">
+    <p class="error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></p>
+
+    <label>Cliente</label>
+    <select th:field="*{customerId}">
+        <option value="">-- Seleccione --</option>
+        <option th:each="c : ${customers}" th:value="${c.id}"
+                th:text="${c.name + ' (' + c.documentType + ' ' + c.document + ')'}"></option>
+    </select>
+    <p class="error" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></p>
+
+    <h3>Productos</h3>
+    <table>
+        <tr><th>#</th><th>Producto</th><th>Cantidad</th></tr>
+        <tr th:each="line, st : *{lines}">
+            <td th:text="${st.count}"></td>
+            <td>
+                <select th:field="*{lines[__${st.index}__].productId}">
+                    <option value="">-- Seleccione --</option>
+                    <option th:each="p : ${products}" th:value="${p.id}"
+                            th:text="${p.name + ' — S/ ' + #numbers.formatDecimal(p.price, 1, 2) + ' — stock ' + p.stock}"></option>
+                </select>
+                <div class="error" th:if="${#fields.hasErrors('lines[__${st.index}__].productId')}"
+                     th:errors="*{lines[__${st.index}__].productId}"></div>
+            </td>
+            <td>
+                <input type="text" th:field="*{lines[__${st.index}__].quantity}">
+                <div class="error" th:if="${#fields.hasErrors('lines[__${st.index}__].quantity')}"
+                     th:errors="*{lines[__${st.index}__].quantity}"></div>
+            </td>
+        </tr>
+    </table>
+    <p><small>Complete solo las filas que necesite. Las filas vacías se ignoran.</small></p>
+
+    <button type="submit">Registrar pedido</button>
+    <a th:href="@{/invoices}">Cancelar</a>
+</form>
+</body>
+</html>

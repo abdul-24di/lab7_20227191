@@ -64,7 +64,7 @@ public class ProductController {
             }
         }
 
-        // Incluye errores de validación Y de conversión (typeMismatch en price / stock)
+        //incluye errores de validación Y de conversión (typeMismatch en price / stock)
         if (bindingResult.hasErrors()) {
             return "products/form";
         }
